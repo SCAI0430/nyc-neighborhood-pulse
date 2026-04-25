@@ -140,6 +140,10 @@ def load_data():
     return df
 
 @st.cache_data
+def load_listings():
+    return pd.read_csv(os.path.join(OUTPUT_DIR, 'listing_locations.csv'))
+
+@st.cache_data
 def load_topics():
     with open(os.path.join(OUTPUT_DIR, 'topic_keywords.json')) as f:
         return json.load(f)
@@ -147,9 +151,10 @@ def load_topics():
 
 # ── Load everything ───────────────────────────────────────────────────────────
 try:
-    neigh_df = load_data()
-    topics   = load_topics()
-    data_ok  = True
+    neigh_df  = load_data()
+    topics    = load_topics()
+    listings  = load_listings()
+    data_ok   = True
 except Exception as e:
     st.error(f"⚠️  Data load error: {e}. Run notebooks 01 and 02 first.")
     st.stop()
@@ -409,27 +414,30 @@ with tab3:
     )
 
     with map_tab1:
-        st.markdown('<p class="map-label">Airbnb Review Density Across NYC</p>', unsafe_allow_html=True)
+        st.markdown('<p class="map-label">Airbnb Listing Density Across NYC</p>', unsafe_allow_html=True)
         st.markdown("""<p class="map-desc">
-        Each circle represents a neighborhood, sized and colored by total review volume.
-        Brighter cyan circles indicate denser Airbnb activity and higher tourist foot traffic.
-        Hover over a circle to see neighborhood details.
+        Each point is an individual Airbnb listing (~25,000 active listings).
+        Color intensity — dark navy to bright cyan — encodes review concentration.
+        Brighter clusters indicate denser short-term rental activity and higher tourist foot traffic.
         </p>""", unsafe_allow_html=True)
 
-        fig_density = px.scatter_map(
-            neigh_df,
+        fig_density = px.density_map(
+            listings,
             lat='lat', lon='lon',
-            size='review_count',
-            color='review_count',
-            hover_name='neighborhood',
-            hover_data={'borough': True, 'review_count': True, 'lat': False, 'lon': False},
-            color_continuous_scale=[[0,'#0a2540'],[0.3,'#0e7490'],[0.6,'#22b5a0'],[1,'#67e8d0']],
-            size_max=45,
-            zoom=10,
-            center={"lat": 40.73, "lon": -73.98},
+            z='reviews',
+            radius=10,
+            zoom=10.5,
+            center={"lat": 40.73, "lon": -73.97},
+            color_continuous_scale=[
+                [0.0, '#0a0d14'],
+                [0.2, '#0d2b45'],
+                [0.4, '#0e4d6b'],
+                [0.6, '#0e7490'],
+                [0.8, '#22b5a0'],
+                [1.0, '#67e8d0'],
+            ],
             map_style='carto-darkmatter',
             height=580,
-            labels={'review_count': 'Reviews', 'borough': 'Borough'},
         )
         fig_density.update_layout(**MAP_LAYOUT, coloraxis_showscale=False)
         st.plotly_chart(fig_density, use_container_width=True)

@@ -8,7 +8,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
+import plotly.graph_objects as go  # noqa: F401 (used for Scattermap)
 import json, os
 
 st.set_page_config(
@@ -421,25 +421,23 @@ with tab3:
         Brighter clusters indicate denser short-term rental activity and higher tourist foot traffic.
         </p>""", unsafe_allow_html=True)
 
-        fig_density = px.density_map(
-            listings,
-            lat='lat', lon='lon',
-            z='reviews',
-            radius=10,
-            zoom=10.5,
-            center={"lat": 40.73, "lon": -73.97},
-            color_continuous_scale=[
-                [0.0, '#0a0d14'],
-                [0.2, '#0d2b45'],
-                [0.4, '#0e4d6b'],
-                [0.6, '#0e7490'],
-                [0.8, '#22b5a0'],
-                [1.0, '#67e8d0'],
-            ],
-            map_style='carto-darkmatter',
+        fig_density = go.Figure(go.Scattermap(
+            lat=listings['lat'],
+            lon=listings['lon'],
+            mode='markers',
+            marker=dict(size=5, color='#22d4b5', opacity=0.18),
+            hoverinfo='skip',
+            showlegend=False,
+        ))
+        fig_density.update_layout(
+            **MAP_LAYOUT,
             height=580,
+            map=dict(
+                style='carto-darkmatter',
+                center=dict(lat=40.73, lon=-73.97),
+                zoom=10,
+            ),
         )
-        fig_density.update_layout(**MAP_LAYOUT, coloraxis_showscale=False)
         st.plotly_chart(fig_density, use_container_width=True)
 
     with map_tab2:

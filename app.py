@@ -34,7 +34,7 @@ st.markdown("""
     border-bottom: 1px solid #1e2535;
   }
   .site-title {
-    color: #c084fc; font-size: 2.625rem; font-weight: 700;
+    color: #c084fc !important; font-size: 2.625rem !important; font-weight: 700 !important;
     letter-spacing: 0.18em; text-transform: uppercase; margin: 0;
   }
   .site-subtitle { color: #64748b; font-size: 0.9rem; margin: 0.3rem 0 1.2rem 0; }
@@ -60,7 +60,7 @@ st.markdown("""
     background: #141824; border: 1px solid #1e2535; border-radius: 12px;
     padding: 1.2rem 1.5rem; margin-bottom: 0.75rem;
   }
-  .kpi-value { font-size: 5rem; font-weight: 700; color: #c084fc; margin: 0; line-height: 1; }
+  .kpi-value { font-size: 5rem !important; font-weight: 700 !important; color: #c084fc !important; margin: 0; line-height: 1; }
   .kpi-label { font-size: 0.8rem; color: #64748b; margin-top: 0.4rem;
     text-transform: uppercase; letter-spacing: 0.08em; }
 
@@ -75,7 +75,7 @@ st.markdown("""
   .insight-card strong { color: #e2e8f0; display: block; margin-bottom: 0.3rem; font-size: 0.87rem; }
 
   /* Section headings */
-  .section-title { font-size: 3.375rem; font-weight: 700; color: #e2e8f0; margin-bottom: 0.3rem; }
+  .section-title { font-size: 3.375rem !important; font-weight: 700 !important; color: #e2e8f0 !important; margin-bottom: 0.3rem; }
   .section-sub { font-size: 0.88rem; color: #94a3b8; margin-bottom: 1.4rem; line-height: 1.65; }
 
   /* Map labels */
@@ -107,6 +107,22 @@ st.markdown("""
 # ── Paths ─────────────────────────────────────────────────────────────────────
 BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(BASE_DIR, 'outputs')
+
+# ── Topic subtitles (plain-language description shown under each topic label) ─
+TOPIC_SUBTITLES = {
+    'Great Location & Transit':    'subway access · walkability · central location',
+    'Spanish-Speaking Visitors':   'Latino communities · Spanish-language reviews',
+    'Parks & Outdoor Life':        'green space · outdoor activities · nature',
+    'Nightlife & Entertainment':   'bars · music · evening energy',
+    'Truly Enjoyable Experience':  'memorable stays · highly recommended',
+    'Clean & Comfortable Stay':    'cleanliness · check-in · apartment basics',
+    'Feels Like Home':             'warmth · residential character · local vibe',
+    'NYC City Experience':         'urban energy · iconic neighborhoods · city life',
+    'German-Speaking Visitors':    'German-speaking visitors · European travelers',
+    'French-Speaking Visitors':    'Francophone visitors · French-language reviews',
+    'Nice & Pleasant Place':       'charming atmosphere · welcoming · pleasant stays',
+    'Practical Comfort':           'cleanliness · check-in · apartment basics',
+}
 
 # ── Topic color palette ───────────────────────────────────────────────────────
 TOPIC_COLORS = {
@@ -180,26 +196,27 @@ with tab1:
     left, right = st.columns([3, 2], gap="large")
 
     with left:
-        st.markdown('<p class="section-title">What makes each NYC neighborhood feel the way it does?</p>', unsafe_allow_html=True)
+        st.markdown('<p class="section-title">Can Airbnb reviews reveal a social geography of NYC that differs from official neighborhood categories?</p>', unsafe_allow_html=True)
         st.markdown("""
         <p class="section-sub">
-        New York City comprises 220 distinct neighborhoods, each with its own social rhythm,
-        cultural texture, and sense of place. But how do we <em>measure</em> something
-        as intangible as neighborhood character?
+        New York City's 220 neighborhoods are officially defined by administrative boundaries —
+        but boundaries don't capture how a place actually <em>feels</em>. This project asks
+        whether the language of 149,903 Airbnb guest reviews can surface a different kind of map:
+        one organized around social character, visitor perception, and lived urban experience.
         </p>
         <p class="section-sub">
-        This project uses <strong style="color:#c084fc">149,903 Airbnb guest reviews</strong>
-        from 2022–2024 as a lens. Visitors leave behind traces of what they noticed,
-        loved, and remembered — transit access, local food scenes, a sense of safety,
-        a distinctly local character. By applying NLP topic modeling to these reviews,
-        we surface a hidden social geography of New York.
+        Visitors leave behind traces of what they noticed, loved, and remembered —
+        transit access, local food scenes, a sense of safety, a distinctly local energy.
+        By applying NLP topic modeling to these reviews, we extract ten recurring themes
+        and map them across the city, revealing a <strong style="color:#c084fc">social geography
+        of NYC</strong> that cuts across borough lines and official classifications.
         </p>
         <p class="section-sub">
         The result is two complementary interactive maps: one showing
         <strong style="color:#c084fc">where Airbnb activity concentrates</strong>
-        across the city's fine-grained geography, and another revealing
-        <strong style="color:#c084fc">what each neighborhood is known for</strong>
-        — its dominant theme as perceived by thousands of guests.
+        at listing-level resolution, and another revealing
+        <strong style="color:#c084fc">what each neighborhood is distinctively known for</strong>
+        — not what is common everywhere, but what makes each place unusually itself.
         </p>
         """, unsafe_allow_html=True)
 
@@ -229,12 +246,14 @@ with tab1:
     cols = st.columns(5)
     for i, (topic, count) in enumerate(topic_counts.items()):
         color = TOPIC_COLORS.get(topic, '#888888')
+        subtitle = TOPIC_SUBTITLES.get(topic, '')
         with cols[i % 5]:
             st.markdown(f"""
             <div style="background:#141824;border:1px solid #1e2535;border-top:3px solid {color};
                         border-radius:8px;padding:0.9rem;margin-bottom:0.75rem;text-align:center;">
               <div style="font-size:1.5rem;font-weight:700;color:{color};">{count}</div>
-              <div style="font-size:0.71rem;color:#94a3b8;margin-top:0.25rem;line-height:1.4;">{topic}</div>
+              <div style="font-size:0.75rem;font-weight:600;color:#e2e8f0;margin-top:0.25rem;line-height:1.4;">{topic}</div>
+              <div style="font-size:0.65rem;color:#64748b;margin-top:0.2rem;line-height:1.4;font-style:italic;">{subtitle}</div>
             </div>""", unsafe_allow_html=True)
 
 
@@ -358,14 +377,22 @@ with tab2:
 
     with c3r:
         st.markdown('<p class="section-title" style="font-size:1.15rem;">Small Neighborhoods, Stronger Identities</p>', unsafe_allow_html=True)
-        st.markdown("""<p class="section-sub">
-        The <strong style="color:#c084fc">distinctiveness score</strong> measures how much
-        a neighborhood's dominant topic exceeds the city-wide average —
-        analogous to TF-IDF applied geographically.<br><br>
-        There is a clear inverse relationship: neighborhoods with fewer reviews score
-        higher on distinctiveness. High-volume areas like Midtown or Williamsburg attract
-        such diverse visitors that no single theme dominates. Smaller, niche neighborhoods
-        attract a more homogeneous visitor type, making their character more legible.<br><br>
+        st.markdown("""
+        <div style="background:#1a1035;border-left:3px solid #c084fc;border-radius:6px;
+                    padding:0.8rem 1rem;margin-bottom:1rem;">
+          <span style="color:#e2e8f0;font-size:0.88rem;font-style:italic;">
+          "Instead of showing what is common everywhere, this score highlights
+          what a neighborhood is <strong>unusually</strong> known for."
+          </span>
+        </div>
+        <p class="section-sub">
+        The <strong style="color:#c084fc">distinctiveness score</strong> divides each
+        neighborhood's topic proportion by the city-wide average — a geographic TF-IDF.
+        A score of 2.0 means that topic is twice as prevalent here as across NYC overall.<br><br>
+        There is a clear inverse relationship: high-volume areas like Midtown or Williamsburg
+        attract such diverse visitors that no single theme dominates, pushing scores lower.
+        Smaller, niche neighborhoods draw a more homogeneous visitor type, making their
+        character sharper and more legible.<br><br>
         <span style="color:#64748b;">Hover over points to explore individual neighborhoods.</span>
         </p>""", unsafe_allow_html=True)
 
